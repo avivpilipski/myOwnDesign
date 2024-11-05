@@ -17,30 +17,23 @@ This will be a 3D experience featuring elements of a national park such as anima
 ### Natural Landscapes
 - **Dynamic Terrain**: Users can customize topography with hills, valleys, rivers, and lakes. Elevation, water flow, and landforms can be manipulated to design unique parks.
 - **Seasonal Changes**: The environment will change with the seasons, showcasing vibrant autumn leaves, winter snow, spring blooms, and summer greenery.
-
-### Edwin Comment:
-Specify here how the seasons change. Is there a day-night cycle? Can the player change the season at will?
+- The seasons will change as akin to the Earth - rotating between fall, winter, spring summer. 
+- There is also a day-night cycle that the player will not be able to change: it will align with the player's time zone!
 
 ![forest landscape](output-2.jpg)
-
-### Edwin Comment:
-You might want to add more pictures here showing the landscape in different seasons
 
 ### Flora and Fauna
 - **Diverse Plant Life**: Include various 3D models of trees, shrubs, flowers, and grasses. Rare species can be offered as achievement rewards.
 - **Wildlife Models**: Realistic 3D animals (e.g., bears, deer, birds) that interact with the park environment. Users can attract specific wildlife by planting certain flora.
-
-### Edwin Comment:
-Specify if there is a purpose to these animals. How do you get more animals to come to your park? Do they attract more visitors?
+- The purpose of implementing animals is not only to motivate the user to tend to them and create a diverse, flourishing, and biodiverse natural parrk, but also has the simultaneous purpose of attracting visitors. 
 
 **Image Placeholder: Examples of plants and wildlife.**
 
 ### Interactive Features
 - **Weather Effects**: Real-time weather changes, such as rain, snow, fog, and sunlight. Certain plants may thrive in specific weather conditions.
 - **Natural Disasters**: Simulations of wildfires, floods, and storms that users must strategize around to protect their parks.
-
-### Edwin Comment:
-How do people prevent these natural disasters? Specify what kind of buildings or other things can be built to serve this purpose. Is there a way to lose the game?
+- There is no way to prvent the occurence of these natural disasters much as on Eearth. Buildings, however, can be optimized using technology and reinforcement techniques to help safeguard against these events. 
+- Further, there is no way to "loose" the game. If a natural disasters sweeps through your forest and wreaks havoc, you will do you as all the humans have done before you. Perservere. 
 
 
 ### User-Created Structures
@@ -49,19 +42,12 @@ How do people prevent these natural disasters? Specify what kind of buildings or
 
 **Image Placeholder: Examples of user-created structures and eco-friendly designs.**
 
-## Community and Social Spaces
-- **Gathering Areas**: Communal spots where avatars can meet, share tips, and celebrate achievements, reinforcing the concept of a third space.
-- **Event Spaces**: Designated areas for in-game events, such as festivals celebrating biodiversity or environmental awareness days.
-
-### Edwin Comment:
-So is this a multiplayer game? Maybe you should specify that earlier if so. 
-
 ## Gamification Elements
 - **Achievement Badges**: Earn visually appealing badges or trophies for accomplishments like creating balanced ecosystems or saving endangered species.
 - **Interactive Quests**: Tasks that guide users through park exploration and conservation efforts, adding a lifelong learning component.
-
-### Edwin Comment:
-Maybe specify more about how the player plays the game. Is there a currency system for buying buildings to create the park or is it like a creative mode sandbox where the player can getinfinite of whatever they want? Should also specify how the player navigates the game. Is it first person, third person, or top down? Is there going to be a main character? If so, is there a story behind them?
+- THIS IS A SANDBOX GAME - the player can get infinite reasources to start their national park EXCEPT animals cannot be created on command - they must be bred and crossed carefully to ensure park vitality. 
+- The player navigates the game from a birds-eye view, everything is developed and viewed from above. 
+- YOU are the main character in the game, and you get to choose your appearance and outfit before starting to build your park. 
 
 
 ## Artistic Style
@@ -77,6 +63,3 @@ Maybe specify more about how the player plays the game. Is there a currency syst
 ## User Interface (UI)
 - **Intuitive Design**: A UI that blends seamlessly with the 3D world, using natural elements like leaves or stones for buttons and menus.
 - **Tutorial Elements**: Integrated tutorial prompts to guide users through the building process, making it accessible for all skill levels.
-
-### Edwin Comment:
-Overall, just add a lot more images everywhere that are more specific. EX: images showing the UI, the community space, different seasons, natural disasters, the achievements, and more
