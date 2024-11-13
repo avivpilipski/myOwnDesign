@@ -25,21 +25,22 @@ Unity (with WebGL Export), Three.js, Babylon.js:
 This is the global state of the game
 
 - Variables
-   -  `entities: std::List<Entity>`: a list of the objects in the user's national park
-   -  `time: int`: This is modified every tick, and the weather and season is a function of it
+  - `entities: std::List<Entity>`: a list of the objects in the user's national park
+  - `time: int`: This is modified every tick, and the weather and season is a function of it
 - Methods
-   - `addEntity`
-     - **Behavior:** places an entity into the national park
-   - `getWeather`
-     - **Behavior:** gets the weather based on the game time
-   - `tickGamePlay`
-     - **Behavior:** increments time
+  - `addEntity`
+    - **Behavior:** places an entity into the national park
+  - `getWeather`
+    - **Behavior:** gets the weather based on the game time (day/night, clouds, seasonal attributes)
+  - `tickGamePlay`
+    - **Behavior:** increments time
 
 ### Entity
 
- - Variables
-   - `position: Point` the location of the national park element
-   - `geometry: Geometry` what to display at the given location
+- Variables
+  - `position: Point` the location of the national park element
+  - `geometry: Geometry` what to display at the given location
 
 ## Data Model
+
 [here](https://www.figma.com/board/xqyhuKFsVyTD0bIMtytAwT/Untitled?node-id=0-1&node-type=canvas&t=jQZwJDpvA3CjMZgu-0)
