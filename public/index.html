@@ -1,89 +1,424 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Park Interactive Map</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .controls button {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .controls button:hover {
+      background: #45a049;
+      transform: translateY(-2px);
+    }
+    .toolbar {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toolbar button {
+      padding: 10px 15px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      background: #2196F3;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toolbar button.active {
+      background: #FFA500;
+      transform: scale(1.05);
+    }
+    .tooltip {
+      position: fixed;
+      padding: 5px 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: 5px;
+      pointer-events: none;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button id="add-tree">🌲 Tree</button>
+    <button id="add-mountain">⛰️ Mountain</button>
+    <button id="add-river">💧 River</button>
+    <button id="add-rock">🪨 Rock</button>
+    <button id="add-grass">🌿 Grass</button>
+    <button id="clear-tile">🗑️ Clear</button>
+  </div>
+  <div class="controls">
+    <button id="up">↑</button>
+    <button id="down">↓</button>
+    <button id="left">←</button>
+    <button id="right">→</button>
+    <button id="zoom-in">+</button>
+    <button id="zoom-out">-</button>
+    <button id="view-full-map">🗺️ Full Map</button>
+  </div>
+  <div class="tooltip"></div>
+  <script type="module">
+    import * as PIXI from 'https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.mjs';
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/11.0.2/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/11.0.2/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/11.0.2/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    // Initialize PIXI Application with better settings
+    const app = new PIXI.Application({
+      width: window.innerWidth,
+      height: window.innerHeight,
+      backgroundColor: 0x87CEEB,
+      antialias: true,
+      resolution: window.devicePixelRatio || 1,
+    });
+    document.body.appendChild(app.view);
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
+    // Improved asset definitions with better colors and shapes
+    const assets = {
+      tree: `<svg viewBox="0 0 100 100">
+        <path d="M45 70h10v30h-10z" fill="#5D4037"/>
+        <path d="M50 0l35 50H15z" fill="#2E7D32"/>
+        <path d="M50 20l30 45H20z" fill="#388E3C"/>
+      </svg>`,
+      mountain: `<svg viewBox="0 0 100 100">
+        <path d="M10 80L50 20 90 80z" fill="#757575"/>
+        <path d="M20 80L50 40 80 80z" fill="#9E9E9E"/>
+        <path d="M30 80L50 50 70 80z" fill="#BDBDBD"/>
+      </svg>`,
+      rock: `<svg viewBox="0 0 100 100">
+        <path d="M20 40c0 0 10-20 30-20s30 10 30 30-10 30-30 30-30-20-30-40z" fill="#757575"/>
+        <path d="M30 45c0 0 5-10 20-10s20 5 20 15-5 15-20 15-20-10-20-20z" fill="#9E9E9E"/>
+      </svg>`,
+      grass: `<svg viewBox="0 0 100 100">
+        <path d="M10 80c10-30 20-40 30 0 M30 80c10-40 20-40 30 0 M50 80c10-30 20-40 30 0" stroke="#4CAF50" stroke-width="5" fill="none"/>
+      </svg>`,
+    };
+
+    // Convert SVG to texture with error handling
+    function svgToTexture(svg) {
+      try {
+        const blob = new Blob([svg], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const texture = PIXI.Texture.from(url);
+        URL.revokeObjectURL(url);
+        return texture;
+      } catch (error) {
+        console.error('Error creating texture:', error);
+        // Return a fallback texture
+        const graphics = new PIXI.Graphics();
+        graphics.beginFill(0xFF0000);
+        graphics.drawRect(0, 0, 50, 50);
+        graphics.endFill();
+        return app.renderer.generateTexture(graphics);
       }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    }
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+    // Create textures
+    const textures = {};
+    for (const [key, svg] of Object.entries(assets)) {
+      textures[key] = svgToTexture(svg);
+    }
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+    const tileSize = 80; // Smaller tiles for better performance
+    const mapContainer = new PIXI.Container();
+    app.stage.addChild(mapContainer);
+
+    // Improved River class with smoother animation
+    class River extends PIXI.Graphics {
+      constructor(startX, startY) {
+        super();
+        this.lineStyle(4, 0x2196F3, 0.8);
+        this.startX = startX;
+        this.startY = startY;
+        this.points = this.generateRiverPoints();
+        this.flowOffset = 0;
+        this.animate();
+      }
+
+      generateRiverPoints() {
+        const points = [];
+        let x = this.startX;
+        let y = this.startY;
+        const segments = 12;
+        
+        for (let i = 0; i < segments; i++) {
+          points.push({
+            x: x + Math.sin(i * 0.5) * 20,
+            y: y + i * (tileSize / segments)
+          });
         }
+        return points;
+      }
+
+      animate() {
+        app.ticker.add(() => {
+          this.flowOffset += 0.1;
+          this.clear();
+          this.lineStyle(4, 0x2196F3, 0.8);
+          this.moveTo(this.points[0].x, this.points[0].y);
+
+          for (let i = 1; i < this.points.length; i++) {
+            const wave = Math.sin(this.flowOffset + i * 0.3) * 3;
+            this.lineTo(
+              this.points[i].x + wave,
+              this.points[i].y
+            );
+          }
+        });
+      }
+    }
+
+    // Improved Tile class with better interaction
+    class Tile extends PIXI.Container {
+      constructor(x, y) {
+        super();
+        this.tileX = x;
+        this.tileY = y;
+        this.x = x * tileSize;
+        this.y = y * tileSize;
+        this.interactive = true;
+        this.cursor = 'pointer';
+        
+        // Background
+        this.background = new PIXI.Graphics();
+        this.background.beginFill(0x81C784);
+        this.background.drawRect(0, 0, tileSize, tileSize);
+        this.background.endFill();
+        this.addChild(this.background);
+
+        // Grid lines
+        this.grid = new PIXI.Graphics();
+        this.grid.lineStyle(1, 0x000000, 0.1);
+        this.grid.drawRect(0, 0, tileSize, tileSize);
+        this.addChild(this.grid);
+
+        this.elements = new Set();
+        this.setupInteraction();
+      }
+
+      setupInteraction() {
+        this.on('pointerover', this.onHover.bind(this));
+        this.on('pointerout', this.onUnhover.bind(this));
+        this.on('pointertap', this.onClick.bind(this));
+
+        // Show tooltip on hover
+        this.on('pointerover', () => {
+          const tooltip = document.querySelector('.tooltip');
+          tooltip.style.display = 'block';
+          
+          this.on('pointermove', (event) => {
+            tooltip.style.left = event.clientX + 10 + 'px';
+            tooltip.style.top = event.clientY + 10 + 'px';
+            tooltip.textContent = `Tile (${this.tileX}, ${this.tileY})`;
+          });
+        });
+
+        this.on('pointerout', () => {
+          const tooltip = document.querySelector('.tooltip');
+          tooltip.style.display = 'none';
+        });
+      }
+
+      onHover() {
+        this.background.tint = 0xA5D6A7;
+        this.scale.set(1.02);
+      }
+
+      onUnhover() {
+        this.background.tint = 0xFFFFFF;
+        this.scale.set(1);
+      }
+
+      onClick() {
+        if (!window.selectedTool) {
+          return;
+        }
+
+        const prevScale = this.scale.x;
+        this.scale.set(0.95);
+        setTimeout(() => this.scale.set(prevScale), 100);
+
+        if (window.selectedTool === 'clear') {
+          this.clearElements();
+        } else {
+          this.addElement(window.selectedTool);
+        }
+      }
+
+      addElement(type) {
+        this.clearElements(); // Clear existing elements first
+
+        if (type === 'river') {
+          const river = new River(0, 0);
+          this.addChild(river);
+          this.elements.add(river);
+        } else {
+          const sprite = new PIXI.Sprite(textures[type]);
+          sprite.width = tileSize * 0.8;
+          sprite.height = tileSize * 0.8;
+          sprite.x = tileSize * 0.1;
+          sprite.y = tileSize * 0.1;
+          sprite.alpha = 0;
+          
+          // Fade in animation
+          app.ticker.add(function fadeIn() {
+            sprite.alpha += 0.1;
+            if (sprite.alpha >= 1) {
+              app.ticker.remove(fadeIn);
+            }
+          });
+
+          this.addChild(sprite);
+          this.elements.add(sprite);
+        }
+      }
+
+      clearElements() {
+        this.elements.forEach(element => {
+          // Fade out animation
+          app.ticker.add(function fadeOut() {
+            element.alpha -= 0.1;
+            if (element.alpha <= 0) {
+              element.destroy();
+              app.ticker.remove(fadeOut);
+            }
+          });
+        });
+        this.elements.clear();
+      }
+    }
+
+    // Generate map
+    const gridWidth = 15;
+    const gridHeight = 15;
+    const tiles = [];
+
+    for (let y = 0; y < gridHeight; y++) {
+      for (let x = 0; x < gridWidth; x++) {
+        const tile = new Tile(x, y);
+        mapContainer.addChild(tile);
+        tiles.push(tile);
+      }
+    }
+
+    // Tool selection with visual feedback
+    window.selectedTool = null;
+    const toolButtons = document.querySelectorAll('.toolbar button');
+    
+    toolButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        toolButtons.forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+        window.selectedTool = button.id.replace('add-', '');
       });
-    </script>
-  </body>
+    });
+
+    // Smooth camera controls
+    let zoomLevel = 1;
+    let targetZoom = 1;
+    let offsetX = 0;
+    let offsetY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    function updateCamera() {
+      // Smooth zoom
+      zoomLevel += (targetZoom - zoomLevel) * 0.1;
+      mapContainer.scale.set(zoomLevel);
+
+      // Smooth pan
+      offsetX += (targetX - offsetX) * 0.1;
+      offsetY += (targetY - offsetY) * 0.1;
+      mapContainer.x = -offsetX;
+      mapContainer.y = -offsetY;
+
+      requestAnimationFrame(updateCamera);
+    }
+    updateCamera();
+
+    // Movement controls
+    const moveAmount = 50;
+    document.getElementById('up').onclick = () => targetY -= moveAmount;
+    document.getElementById('down').onclick = () => targetY += moveAmount;
+    document.getElementById('left').onclick = () => targetX -= moveAmount;
+    document.getElementById('right').onclick = () => targetX += moveAmount;
+
+    // Zoom controls
+    document.getElementById('zoom-in').onclick = () => {
+      targetZoom = Math.min(2, targetZoom + 0.1);
+    };
+
+    document.getElementById('zoom-out').onclick = () => {
+      targetZoom = Math.max(0.1, targetZoom - 0.1);
+    };
+
+    document.getElementById('view-full-map').onclick = () => {
+      const targetZoom = Math.min(
+        app.screen.width / (gridWidth * tileSize),
+        app.screen.height / (gridHeight * tileSize)
+      ) * 0.9;
+      
+      zoomLevel = targetZoom;
+      mapContainer.scale.set(zoomLevel);
+      
+      offsetX = (gridWidth * tileSize * zoomLevel - app.screen.width) / 2;
+      offsetY = (gridHeight * tileSize * zoomLevel - app.screen.height) / 2;
+      updateMap();
+    };
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      app.renderer.resize(window.innerWidth, window.innerHeight);
+    });
+
+    // Keyboard controls
+    window.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowUp':
+          offsetY -= scrollSpeed;
+          break;
+        case 'ArrowDown':
+          offsetY += scrollSpeed;
+          break;
+        case 'ArrowLeft':
+          offsetX -= scrollSpeed;
+          break;
+        case 'ArrowRight':
+          offsetX += scrollSpeed;
+          break;
+      }
+      updateMap();
+    });
+  </script>
+</body>
 </html>
