@@ -40,7 +40,7 @@ This will be a 3D experience featuring elements of a national park such as anima
 - **Weather Effects**: Real-time weather changes, such as rain, snow, fog, and sunlight. Certain plants may thrive in specific weather conditions.
 - **Natural Disasters**: Simulations of wildfires, floods, and storms that users must strategize around to protect their parks.
 - There is no way to prevent the occurrence of these natural disasters much as on Earth. Buildings, however, can be optimized using technology and reinforcement techniques to help safeguard against these events.
-- Further, there is no way to "lose" the game. If a natural disasters sweeps through your forest and wreaks havoc, you will do you as all the humans have done before you. Persevere.
+- Further, there is no way to "lose" the game. If a natural disasters sweeps through your forest and wreaks havoc, you will do you as all the humans have done before you: Persevere.
 
 ### User-Created Structures
 
