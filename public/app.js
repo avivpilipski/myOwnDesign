@@ -6,7 +6,83 @@ const app = new PIXI.Application({
   backgroundColor: 0x87CEEB, // Sky blue color
 });
 document.body.appendChild(app.view);
+import React, { useState } from 'react';
 
+const WelcomeScreen = () => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  const startApp = () => {
+    setIsVisible(false);
+    // Initialize the main app after animation
+    setTimeout(() => {
+      document.getElementById('welcome-screen')?.remove();
+      initializeMainApp();
+    }, 1000);
+  };
+
+  return (
+    <div
+      id="welcome-screen"
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-900 
+        transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+    >
+      <div className="text-center p-8 max-w-2xl">
+        <h1 className="text-5xl font-bold text-green-400 mb-6">
+          National Park Explorer
+        </h1>
+        <p className="text-xl text-gray-300 mb-8">
+          Create and explore your own virtual national park. Place trees, mountains, 
+          rivers, and more to design your perfect wilderness landscape.
+        </p>
+        <div className="space-y-4">
+          <div className="flex justify-center space-x-8 mb-8">
+            <div className="text-center">
+              <span className="text-4xl">🌲</span>
+              <p className="text-gray-400">Trees</p>
+            </div>
+            <div className="text-center">
+              <span className="text-4xl">⛰️</span>
+              <p className="text-gray-400">Mountains</p>
+            </div>
+            <div className="text-center">
+              <span className="text-4xl">💧</span>
+              <p className="text-gray-400">Rivers</p>
+            </div>
+            <div className="text-center">
+              <span className="text-4xl">🪨</span>
+              <p className="text-gray-400">Rocks</p>
+            </div>
+          </div>
+          <button
+            onClick={startApp}
+            className="px-8 py-4 bg-green-500 text-white rounded-lg text-xl 
+              hover:bg-green-600 transform hover:-translate-y-1 transition-all
+              focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
+          >
+            Start Exploring
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Function to initialize the main application
+const initializeMainApp = () => {
+  const app = new PIXI.Application({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    backgroundColor: 0x87CEEB,
+    antialias: true,
+    resolution: window.devicePixelRatio || 1,
+  });
+  document.body.appendChild(app.view);
+  
+  // Rest of your PIXI.js initialization code here
+  // Copy your existing PIXI.js code here
+};
+
+export default WelcomeScreen;
 // Load assets (replace with actual images)
 const assets = {
   tree: PIXI.Texture.from('/mnt/data/output-2.jpg'),   // Placeholder for tree
