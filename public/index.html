@@ -3,94 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>National Park Interactive Map</title>
+  <title>National Park Explorer</title>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/index.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      background: #87CEEB;
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      font-family: Arial, sans-serif; 
+      background: #87CEEB; 
     }
-    .controls {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 15px;
-      border-radius: 10px;
-      z-index: 1000;
-    }
-    .controls button {
+    .tool-btn {
       padding: 10px 15px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      background: #4CAF50;
+      background: rgba(0,0,0,0.7);
       color: white;
-      cursor: pointer;
+      border-radius: 5px;
+      margin: 5px 0;
+      transition: all 0.3s ease;
     }
-    .toolbar {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 15px;
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 1000;
+    .tool-btn:hover {
+      background: rgba(255,255,255,0.2);
     }
-    .toolbar button {
+    .nav-btn {
+      background: rgba(0,0,0,0.7);
+      color: white;
       padding: 10px 15px;
-      font-size: 14px;
-      border: none;
       border-radius: 5px;
-      background: #2196F3;
-      color: white;
-      cursor: pointer;
+      transition: all 0.3s ease;
     }
-    .toolbar button.active {
-      background: #FFA500;
-    }
-    .tooltip {
-      position: fixed;
-      padding: 5px 10px;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      border-radius: 5px;
-      pointer-events: none;
-      display: none;
-      z-index: 1001;
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.2);
     }
   </style>
 </head>
 <body>
-  <div class="toolbar">
-    <button id="add-tree">🌲 Tree</button>
-    <button id="add-mountain">⛰️ Mountain</button>
-    <button id="add-river">💧 River</button>
-    <button id="add-rock">🪨 Rock</button>
-    <button id="add-grass">🌿 Grass</button>
-    <button id="clear-tile">🗑️ Clear</button>
+  <div id="welcome-container" class="fixed inset-0 z-50 bg-gradient-to-br from-green-900 to-blue-900 
+    flex items-center justify-center transition-all duration-1000">
+    <div class="text-center p-8 max-w-3xl">
+      <h1 class="text-6xl font-bold text-green-300 mb-6 animate-pulse">
+        Build Your Own National Park
+      </h1>
+      <p class="text-2xl text-gray-200 mb-8">
+        Craft your wilderness, one tile at a time
+      </p>
+      <div class="space-x-8 mb-12 flex justify-center">
+        <div class="text-center">
+          <span class="text-4xl">🌲</span>
+          <p class="text-gray-400">Trees</p>
+        </div>
+        <div class="text-center">
+          <span class="text-4xl">⛰️</span>
+          <p class="text-gray-400">Mountains</p>
+        </div>
+        <div class="text-center">
+          <span class="text-4xl">💧</span>
+          <p class="text-gray-400">Rivers</p>
+        </div>
+        <div class="text-center">
+          <span class="text-4xl">🪨</span>
+          <p class="text-gray-400">Rocks</p>
+        </div>
+        <div class="text-center">
+          <span class="text-4xl">🐻</span>
+          <p class="text-gray-400">Animals</p>
+        </div>
+      </div>
+      <button id="start-game-btn" 
+        class="px-10 py-4 bg-green-500 text-white rounded-lg text-xl 
+        hover:bg-green-600 transform hover:-translate-y-1 transition-all">
+        Start Exploring
+      </button>
+      <p class="text-sm text-gray-400 mt-4">
+        Created by Aviv Pilipski
+      </p>
+    </div>
   </div>
-  <div class="controls">
-    <button id="up">↑</button>
-    <button id="down">↓</button>
-    <button id="left">←</button>
-    <button id="right">→</button>
-    <button id="zoom-in">+</button>
-    <button id="zoom-out">-</button>
-    <button id="view-full-map">🗺️ Full Map</button>
+
+  <div class="toolbar fixed top-4 left-4 z-50" style="display:none;">
+    <div class="bg-black/80 p-4 rounded-lg flex flex-col gap-2">
+      <button id="add-tree" class="tool-btn">🌲 Tree</button>
+      <button id="add-mountain" class="tool-btn">⛰️ Mountain</button>
+      <button id="add-river" class="tool-btn">💧 River</button>
+      <button id="add-rock" class="tool-btn">🪨 Rock</button>
+      <button id="add-grass" class="tool-btn">🌿 Grass</button>
+      <button id="add-animal" class="tool-btn">🐻 Animal</button>
+      <button id="clear-tile" class="tool-btn">🗑️ Clear</button>
+    </div>
   </div>
-  <div class="tooltip"></div>
+
+  <div class="controls fixed bottom-4 left-1/2 -translate-x-1/2 z-50" style="display:none;">
+    <div class="bg-black/80 p-4 rounded-lg flex gap-2">
+      <button id="up" class="nav-btn">↑</button>
+      <button id="down" class="nav-btn">↓</button>
+      <button id="left" class="nav-btn">←</button>
+      <button id="right" class="nav-btn">→</button>
+      <button id="zoom-in" class="nav-btn">+</button>
+      <button id="zoom-out" class="nav-btn">-</button>
+      <button id="view-full-map" class="nav-btn">🗺️</button>
+    </div>
+  </div>
 
   <script type="module">
     import * as PIXI from 'https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.mjs';
     
+
     // Initialize PIXI Application
     const app = new PIXI.Application({
       width: window.innerWidth,
@@ -271,6 +288,13 @@
       mapContainer.x = (app.screen.width - gridWidth * tileSize * scale) / 2;
       mapContainer.y = (app.screen.height - gridHeight * tileSize * scale) / 2;
     };
+     // Game Initialization
+     document.getElementById('start-game-btn').addEventListener('click', () => {
+      document.getElementById('welcome-container').style.display = 'none';
+      document.querySelector('.toolbar').style.display = 'block';
+      document.querySelector('.controls').style.display = 'block';
+      new NationalParkGame();
+    });
 
     // Handle window resize
     window.addEventListener('resize', () => {
