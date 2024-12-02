@@ -1,39 +1,76 @@
 # Minimum Viable Product
 
 ## Features
-### Placing plants, animals, and basic features like rocks on map (P0)
-- This is simplified from original game. Animals spawning on their own will be too complicated, so now you just place them like any other feature.
-### Animals move around (P0)
-### Placing hills and valleys on map (P2)
-- IDK how that would even affect anything.
-### Placing rivers and lakes on map (P1)
-### Animals breeding (P1)
-- May include animal genders. May require that both animals be fed.
-### Plants growing over time(P2)
-### Natural disasters (P1)
-### 3D view (P2)
-- This won't happen. It's getting simplified to 2D.
-### Seasons changing (P2)
-### day/night cycle (P2)
-### Animal-specific variables (P2)
-- There's like 30 different variables for each animal. Stuff like "tree climbing skill", "antler growth level", and "sun exposure tolerance. None of that is gonna happen. We'll have predators and prey, and male and female. If there's time, we'll have hunger level too, and you'll only be able to mate if you have enough food in your belly.
-### Realistic and detailed art (P2)
-### Buildings and campgrounds (P2)
-### Music (P2)
-### Tutorial (P2)
+
+### Completed Features
+#### Placing plants, animals, and basic features like rocks on map (P0)
+- Users can place elements like trees, rocks, rivers, mountains, grass, and animals on a grid-based map.
+- A toolbar is available to select tools for adding or clearing features.
+
+#### 2D View (P0)
+- The game uses a top-down 2D perspective with grid tiles representing the map.
+
+#### Basic navigation and zoom (P0)
+- Users can move the map using directional buttons (↑, ↓, ←, →).
+- Zoom in/out functionality adjusts the map's scale.
+- A "View Full Map" button centers and scales the map to fit the screen.
+
+### Features Not Yet Implemented
+#### Animals move around (P0)
+- Currently, animals are static when placed on the map.
+
+#### Placing rivers and lakes on map (P1)
+- Only visual representations of rivers are available; no functional "lakes" feature is present.
+
+#### Animals breeding (P1)
+- Not implemented.
+
+#### Natural disasters (P1)
+- Not implemented.
+
+#### Day/night cycle (P2)
+- Not implemented.
+
+#### Placing hills and valleys on map (P2)
+- Not implemented.
+
+#### Plants growing over time (P2)
+- Not implemented.
+
+#### Seasons changing (P2)
+- Not implemented.
+
+#### Animal-specific variables (P2)
+- Not implemented; no predator/prey mechanics or hunger levels exist yet.
+
+#### Realistic and detailed art (P2)
+- The game uses simple graphical elements for trees, mountains, rivers, etc., created with `PIXI.Graphics`.
+
+#### Buildings and campgrounds (P2)
+- Not implemented.
+
+#### Music (P2)
+- Not implemented.
+
+#### Tutorial (P2)
+- Not implemented.
 
 ## Multi-day Plan
+
 ### Day 1-2
-- 2D view
-- Placing plants, animals, and basic features like rocks on map
-- Animals moving around
+- **Completed**:
+  - 2D view.
+  - Placing plants, animals, and basic features like rocks on map.
+
+- **Remaining**:
+  - Animals moving around.
 
 ### Day 3-4
-- Animals breeding and eating
-- basic art
-- Day/night cycle (just visual)
+- Animals breeding and eating.
+- Basic art (current art is functional but can be improved).
+- Day/night cycle (just visual).
 
 ### Day 5
-- Basic natural disasters
-- Hunger levels for breeding
-- Finalization and testing
+- Basic natural disasters.
+- Hunger levels for breeding.
+- Finalization and testing.

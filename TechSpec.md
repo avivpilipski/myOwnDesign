@@ -2,44 +2,85 @@
 
 ## Tech Stack
 
-**#1 Unreal Engine with Pixel Streaming**
-Unreal engine is a seasoned game engine, and supports the web as a target via Pixel Streaming.
-Pros:
-Ray tracing graphics.
-You can hire Unreal Engine developers!
-Battle tested and well documented.
-Cons:
-You need to pay for a server to run the game :(
-You need to code in c++
-Contenders:
-Unity (with WebGL Export), Three.js, Babylon.js:
+### PIXI.js + GSAP + TailwindCSS
+The game is built using **PIXI.js** for rendering, **GSAP** for animations, and **TailwindCSS** for styling.
 
-- Unity runs into performance issues for a game of this scale in the browser
-- Three.js is awesome for graphics, but it doesn't give you a visual way to build scenes, and lacks global illumination (that can be baked into unity games)
-- Babylon.js is ugly and also doesn't have a viewport. It's documentation is ugly too.
+#### Why PIXI.js?
+- **Pros:**
+  - Lightweight and efficient for 2D rendering.
+  - Well-documented with an active community.
+  - Compatible with modern web technologies.
+- **Cons:**
+  - Limited to 2D graphics.
+  - Requires manual implementation for features like a scene graph.
+
+---
 
 ## Architecture
 
-### State
+### Game State
+Tracks gameplay variables and methods affecting the park.
 
-This is the global state of the game
+#### Variables
+- **`entities`**: Tracks all elements on the map (planned but not implemented).  
+- **`time`**: Represents game progression (planned but not implemented).  
 
-- Variables
-   -  `entities: std::List<Entity>`: a list of the objects in the user's national park (P0)
-   -  `time: int`: This is modified every tick, and the weather and season is a function of it (P0)
-- Methods
-   - `addEntity`
-     - **Behavior:** places an entity into the national park (P0)
-   - `getWeather`
-     - **Behavior:** gets the weather based on the game time (P1)
-   - `tickGamePlay`
-     - **Behavior:** increments time (P0)
+#### Methods
+- **`addEntity(entity)`**: Planned but not implemented.  
+- **`tickGamePlay()`**: Planned but not implemented.  
+
+---
 
 ### Entity
+Elements (e.g., trees, mountains) placed on the map.
 
- - Variables
-   - `position: Point` the location of the national park element (P0)
-   - `geometry: Geometry` what to display at the given location (P0)
+#### Variables
+- **`position: {x: number, y: number}`**: The tile's grid coordinates.  
+- **`texture: PIXI.Texture`**: Graphical representation of the element.
 
-## Data Model
-[here](https://www.figma.com/board/xqyhuKFsVyTD0bIMtytAwT/Untitled?node-id=0-1&node-type=canvas&t=jQZwJDpvA3CjMZgu-0)
+---
+
+### Game Map
+The map consists of a **15x15** grid of tiles.
+
+- **Tile Size**: 80px.
+- **Interactions**:
+  - Clicking a tile applies the selected tool’s texture.
+  - Hovering changes tile opacity.
+
+#### Textures
+- **Tree**: Green triangle with a brown base.  
+- **Mountain**: Gray triangle.  
+- **Rock**: Gray ellipse.  
+- **River**: Blue bezier curve.  
+- **Grass**: Green vertical lines.  
+
+Textures are dynamically created using **PIXI.Graphics**.
+
+---
+
+## User Interface
+
+### Welcome Screen
+A styled introduction invites users to "Build Your Own National Park."  
+
+- Features:
+  - Animated title.
+  - Descriptive icons (trees, mountains, rivers, rocks, animals).
+  - "Start Exploring" button to initialize the game.
+
+### Toolbar
+A menu for placing or clearing elements:
+- Tools:
+  - `Tree`, `Mountain`, `River`, `Rock`, `Grass`, `Animal`, `Clear`.
+
+### Controls
+Navigation buttons for map manipulation:
+- **Movement**: `↑`, `↓`, `←`, `→`.  
+- **Zoom**: `+` (zoom in), `-` (zoom out).  
+- **View Full Map**: Centers and scales the map to fit the screen.
+
+---
+
+## Features in Progress
+- Placeholder state management (`time` and `entities`) planned for future iterations.
