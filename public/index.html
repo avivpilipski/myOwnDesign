@@ -4,16 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>National Park Explorer</title>
-  <script src="https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/index.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.js"></script> <!-- PIXI.js for rendering 2D graphics -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/index.js"></script> <!-- GSAP for animations (not currently used in this code) -->
+  <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS for styling -->
   <style>
+    /* Global page styles */
     body { 
       margin: 0; 
       overflow: hidden; 
       font-family: Arial, sans-serif; 
-      background: #87CEEB; 
+      background: #87CEEB; /* Sky blue background color */
     }
+    /* Styling for the tool buttons */
     .tool-btn {
       padding: 10px 15px;
       background: rgba(0,0,0,0.7);
@@ -25,6 +28,7 @@
     .tool-btn:hover {
       background: rgba(255,255,255,0.2);
     }
+    /* Styling for navigation buttons */
     .nav-btn {
       background: rgba(0,0,0,0.7);
       color: white;
@@ -38,8 +42,9 @@
   </style>
 </head>
 <body>
-  <div id="welcome-container" class="fixed inset-0 z-50 bg-gradient-to-br from-green-900 to-blue-900 
-    flex items-center justify-center transition-all duration-1000">
+
+  <!-- Welcome screen container with game description and Start button -->
+  <div id="welcome-container" class="fixed inset-0 z-50 bg-gradient-to-br from-green-900 to-blue-900 flex items-center justify-center transition-all duration-1000">
     <div class="text-center p-8 max-w-3xl">
       <h1 class="text-6xl font-bold text-green-300 mb-6 animate-pulse">
         Build Your Own National Park
@@ -48,6 +53,7 @@
         Craft your wilderness, one tile at a time
       </p>
       <div class="space-x-8 mb-12 flex justify-center">
+        <!-- Icon buttons for different park elements like trees, mountains, etc. -->
         <div class="text-center">
           <span class="text-4xl">🌲</span>
           <p class="text-gray-400">Trees</p>
@@ -69,6 +75,7 @@
           <p class="text-gray-400">Animals</p>
         </div>
       </div>
+      <!-- Start button to begin the game -->
       <button id="start-game-btn" 
         class="px-10 py-4 bg-green-500 text-white rounded-lg text-xl 
         hover:bg-green-600 transform hover:-translate-y-1 transition-all">
@@ -80,6 +87,7 @@
     </div>
   </div>
 
+  <!-- Toolbar with buttons for placing elements (trees, mountains, etc.) -->
   <div class="toolbar fixed top-4 left-4 z-50" style="display:none;">
     <div class="bg-black/80 p-4 rounded-lg flex flex-col gap-2">
       <button id="add-tree" class="tool-btn">🌲 Tree</button>
@@ -92,6 +100,7 @@
     </div>
   </div>
 
+  <!-- Navigation controls (for panning and zooming the map) -->
   <div class="controls fixed bottom-4 left-1/2 -translate-x-1/2 z-50" style="display:none;">
     <div class="bg-black/80 p-4 rounded-lg flex gap-2">
       <button id="up" class="nav-btn">↑</button>
@@ -108,63 +117,64 @@
     import * as PIXI from 'https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.mjs';
     
 
-    // Initialize PIXI Application
+    // Initialize PIXI.js Application
     const app = new PIXI.Application({
-      width: window.innerWidth,
-      height: window.innerHeight,
-      backgroundColor: 0x87CEEB,
-      antialias: true,
+      width: window.innerWidth,     // Set canvas width to the window width
+      height: window.innerHeight,   // Set canvas height to the window height
+      backgroundColor: 0x87CEEB,    // Sky blue background color
+      antialias: true,              // Enable anti-aliasing for smoother graphics
     });
-    document.body.appendChild(app.view);
+    document.body.appendChild(app.view);  // Attach the PIXI canvas to the body
 
-    // Create textures using graphics for better reliability
+    // Helper functions to create textures for park elements (Tree, Mountain, Rock, etc.)
     const createTreeTexture = () => {
       const graphics = new PIXI.Graphics();
-      graphics.beginFill(0x2E7D32);
+      graphics.beginFill(0x2E7D32); // Green for tree leaves
       graphics.drawPolygon([25, 80, 40, 30, 55, 80]);
       graphics.endFill();
-      graphics.beginFill(0x795548);
+      graphics.beginFill(0x795548); // Brown for tree trunk
       graphics.drawRect(37, 80, 6, 20);
       graphics.endFill();
-      return app.renderer.generateTexture(graphics);
+      return app.renderer.generateTexture(graphics);  // Generate texture from graphics
     };
 
     const createMountainTexture = () => {
       const graphics = new PIXI.Graphics();
-      graphics.beginFill(0x757575);
+      graphics.beginFill(0x757575); // Gray color for the mountain
       graphics.drawPolygon([10, 80, 40, 20, 70, 80]);
       graphics.endFill();
-      return app.renderer.generateTexture(graphics);
+      return app.renderer.generateTexture(graphics);  // Generate texture from graphics
     };
 
     const createRockTexture = () => {
       const graphics = new PIXI.Graphics();
-      graphics.beginFill(0x9E9E9E);
-      graphics.drawEllipse(40, 50, 20, 15);
+      graphics.beginFill(0x9E9E9E); // Gray color for rock
+      graphics.drawEllipse(40, 50, 20, 15);  // Elliptical rock shape
       graphics.endFill();
-      return app.renderer.generateTexture(graphics);
+      return app.renderer.generateTexture(graphics);  // Generate texture from graphics
     };
 
     const createRiverTexture = () => {
       const graphics = new PIXI.Graphics();
-      graphics.lineStyle(4, 0x2196F3);
-      graphics.moveTo(30, 20);
-      graphics.bezierCurveTo(40, 40, 30, 60, 40, 80);
-      return app.renderer.generateTexture(graphics);
+      graphics.lineStyle(4, 0x2196F3);  // Blue color for the river
+      graphics.moveTo(30, 20);         // Start of the river curve
+      graphics.bezierCurveTo(40, 40, 30, 60, 40, 80);  // River curve
+      return app.renderer.generateTexture(graphics);  // Generate texture from graphics
     };
 
     const createGrassTexture = () => {
       const graphics = new PIXI.Graphics();
-      graphics.lineStyle(2, 0x4CAF50);
+      graphics.lineStyle(2, 0x4CAF50);  // Green color for grass
       graphics.moveTo(30, 80);
-      graphics.lineTo(30, 60);
+      graphics.lineTo(30, 60);  // Draw grass lines
       graphics.moveTo(40, 80);
       graphics.lineTo(40, 55);
       graphics.moveTo(50, 80);
       graphics.lineTo(50, 65);
-      return app.renderer.generateTexture(graphics);
+      return app.renderer.generateTexture(graphics);  // Generate texture from graphics
     };
 
+    // Store the created textures for reuse
     const textures = {
       tree: createTreeTexture(),
       mountain: createMountainTexture(),
@@ -173,132 +183,143 @@
       grass: createGrassTexture(),
     };
 
+    // Tile class to represent each individual tile in the park grid
     class Tile extends PIXI.Container {
       constructor(x, y, size) {
         super();
-        this.x = x * size;
-        this.y = y * size;
-        this.size = size;
-        this.interactive = true;
-        this.buttonMode = true;
+        this.x = x * size;  // Set the X position of the tile based on the grid size
+        this.y = y * size;  // Set the Y position of the tile based on the grid size
+        this.size = size;   // Size of the tile (80x80px)
+        this.interactive = true;  // Make the tile interactive (clickable)
+        this.buttonMode = true;   // Change cursor to pointer on hover
 
-        // Background
+        // Create the background of the tile
         const background = new PIXI.Graphics();
-        background.beginFill(0x81C784);
-        background.drawRect(0, 0, size, size);
+        background.beginFill(0x81C784);  // Light green color for the background
+        background.drawRect(0, 0, size, size);  // Draw rectangle for the tile
         background.endFill();
-        background.lineStyle(1, 0x000000, 0.1);
+        background.lineStyle(1, 0x000000, 0.1);  // Add a subtle border to the tile
         background.drawRect(0, 0, size, size);
         this.addChild(background);
 
-        this.currentElement = null;
+        this.currentElement = null;  // Track the current element on the tile (tree, rock, etc.)
 
+        // Event listeners for hover and click actions on the tile
         this.on('pointerover', this.onHover.bind(this));
         this.on('pointerout', this.onUnhover.bind(this));
         this.on('pointerdown', this.onClick.bind(this));
       }
 
+      // Handle hover effect (change tile transparency)
       onHover() {
-        this.alpha = 0.8;
+        this.alpha = 0.8;  // Reduce opacity when hovered
       }
 
+      // Reset hover effect
       onUnhover() {
-        this.alpha = 1;
+        this.alpha = 1;  // Reset opacity when mouse is no longer hovering
       }
 
+      // Handle click actions on the tile
       onClick() {
-        if (!window.selectedTool) return;
+        if (!window.selectedTool) return;  // No tool selected, do nothing
 
+        // If the "clear" tool is selected, remove the current element from the tile
         if (window.selectedTool === 'clear') {
           if (this.currentElement) {
             this.removeChild(this.currentElement);
             this.currentElement = null;
           }
         } else {
+          // Otherwise, add the selected tool's element (tree, rock, etc.) to the tile
           if (this.currentElement) {
-            this.removeChild(this.currentElement);
+            this.removeChild(this.currentElement);  // Remove any existing element first
           }
 
-          const sprite = new PIXI.Sprite(textures[window.selectedTool]);
-          sprite.width = this.size * 0.8;
-          sprite.height = this.size * 0.8;
-          sprite.x = this.size * 0.1;
+          const sprite = new PIXI.Sprite(textures[window.selectedTool]);  // Create sprite using the selected tool's texture
+          sprite.width = this.size * 0.8;   // Scale the sprite
+          sprite.height = this.size * 0.8;  // Scale the sprite
+          sprite.x = this.size * 0.1;       // Position sprite inside the tile
           sprite.y = this.size * 0.1;
-          
-          this.addChild(sprite);
-          this.currentElement = sprite;
+
+          this.addChild(sprite);  // Add the sprite to the tile
+          this.currentElement = sprite;  // Track the element on the tile
         }
       }
     }
 
-    // Create map container
+    // Create the map container that holds all the tiles
     const mapContainer = new PIXI.Container();
     app.stage.addChild(mapContainer);
 
-    // Generate tiles
+    // Grid dimensions and tile size
     const tileSize = 80;
     const gridWidth = 15;
     const gridHeight = 15;
 
+    // Generate the grid of tiles
     for (let y = 0; y < gridHeight; y++) {
       for (let x = 0; x < gridWidth; x++) {
-        const tile = new Tile(x, y, tileSize);
-        mapContainer.addChild(tile);
+        const tile = new Tile(x, y, tileSize);  // Create new Tile object for each position in the grid
+        mapContainer.addChild(tile);  // Add the tile to the map container
       }
     }
 
-    // Center the map
+    // Center the map container on the screen
     mapContainer.x = (app.screen.width - gridWidth * tileSize) / 2;
     mapContainer.y = (app.screen.height - gridHeight * tileSize) / 2;
 
-    // Tool selection
+    // Tool selection logic: Track selected tool and apply to the tiles
     window.selectedTool = null;
     document.querySelectorAll('.toolbar button').forEach(button => {
       button.addEventListener('click', () => {
         document.querySelectorAll('.toolbar button').forEach(b => 
-          b.classList.remove('active'));
-        button.classList.add('active');
-        window.selectedTool = button.id.replace('add-', '').replace('clear-', 'clear');
+          b.classList.remove('active'));  // Remove "active" class from all buttons
+        button.classList.add('active');  // Add "active" class to the selected tool button
+        window.selectedTool = button.id.replace('add-', '').replace('clear-', 'clear');  // Set selected tool (tree, rock, etc.)
       });
     });
 
-    // Navigation controls
-    const moveAmount = 50;
-    document.getElementById('up').onclick = () => mapContainer.y += moveAmount;
-    document.getElementById('down').onclick = () => mapContainer.y -= moveAmount;
-    document.getElementById('left').onclick = () => mapContainer.x += moveAmount;
-    document.getElementById('right').onclick = () => mapContainer.x -= moveAmount;
+    // Navigation controls for panning the map
+    const moveAmount = 50;  // Amount to move the map when a navigation button is clicked
+    document.getElementById('up').onclick = () => mapContainer.y += moveAmount;  // Move map up
+    document.getElementById('down').onclick = () => mapContainer.y -= moveAmount;  // Move map down
+    document.getElementById('left').onclick = () => mapContainer.x += moveAmount;  // Move map left
+    document.getElementById('right').onclick = () => mapContainer.x -= moveAmount;  // Move map right
 
-    let scale = 1;
+    // Zoom in and zoom out functionality
+    let scale = 1;  // Initial scale factor
     document.getElementById('zoom-in').onclick = () => {
-      scale = Math.min(2, scale + 0.1);
-      mapContainer.scale.set(scale);
+      scale = Math.min(2, scale + 0.1);  // Limit max zoom-in scale to 2
+      mapContainer.scale.set(scale);  // Apply scale
     };
     document.getElementById('zoom-out').onclick = () => {
-      scale = Math.max(0.5, scale - 0.1);
-      mapContainer.scale.set(scale);
+      scale = Math.max(0.5, scale - 0.1);  // Limit min zoom-out scale to 0.5
+      mapContainer.scale.set(scale);  // Apply scale
     };
 
+    // View the full map by scaling and centering it
     document.getElementById('view-full-map').onclick = () => {
       scale = Math.min(
-        app.screen.width / (gridWidth * tileSize),
-        app.screen.height / (gridHeight * tileSize)
-      ) * 0.9;
-      mapContainer.scale.set(scale);
-      mapContainer.x = (app.screen.width - gridWidth * tileSize * scale) / 2;
-      mapContainer.y = (app.screen.height - gridHeight * tileSize * scale) / 2;
+        app.screen.width / (gridWidth * tileSize),  // Scale based on screen size
+        app.screen.height / (gridHeight * tileSize) // Scale based on screen size
+      ) * 0.9;  // Adjust the scale to fit the screen
+      mapContainer.scale.set(scale);  // Apply the calculated scale
+      mapContainer.x = (app.screen.width - gridWidth * tileSize * scale) / 2;  // Center the map
+      mapContainer.y = (app.screen.height - gridHeight * tileSize * scale) / 2;  // Center the map
     };
-     // Game Initialization
-     document.getElementById('start-game-btn').addEventListener('click', () => {
-      document.getElementById('welcome-container').style.display = 'none';
-      document.querySelector('.toolbar').style.display = 'block';
-      document.querySelector('.controls').style.display = 'block';
-      new NationalParkGame();
+
+    // Start game logic
+    document.getElementById('start-game-btn').addEventListener('click', () => {
+      document.getElementById('welcome-container').style.display = 'none';  // Hide welcome screen
+      document.querySelector('.toolbar').style.display = 'block';  // Show toolbar
+      document.querySelector('.controls').style.display = 'block';  // Show controls
+      new NationalParkGame();  // Initialize the game (not defined in this code)
     });
 
-    // Handle window resize
+    // Handle window resize to adjust the renderer size
     window.addEventListener('resize', () => {
-      app.renderer.resize(window.innerWidth, window.innerHeight);
+      app.renderer.resize(window.innerWidth, window.innerHeight);  // Resize the PIXI canvas
     });
   </script>
 </body>

@@ -84,3 +84,6 @@ Navigation buttons for map manipulation:
 
 ## Features in Progress
 - Placeholder state management (`time` and `entities`) planned for future iterations.
+
+## Data Model
+[here](https://www.figma.com/board/xqyhuKFsVyTD0bIMtytAwT/Untitled?node-id=0-1&node-type=canvas&t=jQZwJDpvA3CjMZgu-0)
