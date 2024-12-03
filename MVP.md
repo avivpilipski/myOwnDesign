@@ -24,6 +24,7 @@
 
 #### Animals breeding (P1)
 - Not implemented.
+- Review FIGMA TO SEE ALL THE DIFFERENT TYPES OF ANIMALS THAT NEED TO BE IMPLEMENTED
 
 #### Natural disasters (P1)
 - Not implemented.
@@ -36,6 +37,7 @@
 
 #### Plants growing over time (P2)
 - Not implemented.
+- Review FIGMA TO SEE ALL THE DIFFERENT FLORA THAT NEED TO BE IMPLEMENTED
 
 #### Seasons changing (P2)
 - Not implemented.
