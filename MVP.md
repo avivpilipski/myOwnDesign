@@ -18,10 +18,10 @@
 #### Animals move around (P0)
 - Currently, animals are no longer static when placed on the map.
 
-### Features Not Yet Implemented
-
 #### Placing rivers and lakes on map (P1)
-- Only visual representations of rivers are available; no functional "lakes" feature is present.
+- adds lakes
+
+### Features Not Yet Implemented
 
 #### Animals breeding (P1)
 - Not implemented.
