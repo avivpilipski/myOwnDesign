@@ -15,9 +15,10 @@
 - Zoom in/out functionality adjusts the map's scale.
 - A "View Full Map" button centers and scales the map to fit the screen.
 
-### Features Not Yet Implemented
 #### Animals move around (P0)
-- Currently, animals are static when placed on the map.
+- Currently, animals are no longer static when placed on the map.
+
+### Features Not Yet Implemented
 
 #### Placing rivers and lakes on map (P1)
 - Only visual representations of rivers are available; no functional "lakes" feature is present.
@@ -63,8 +64,6 @@
 - **Completed**:
   - 2D view.
   - Placing plants, animals, and basic features like rocks on map.
-
-- **Remaining**:
   - Animals moving around.
 
 ### Day 3-4
