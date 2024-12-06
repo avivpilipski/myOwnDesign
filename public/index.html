@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>National Park Explorer</title>
   <!-- External Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.js"></script> <!-- PIXI.js for rendering 2D graphics -->
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/index.js"></script> <!-- GSAP for animations (not currently used in this code) -->
-  <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS for styling -->
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* Global page styles */
     body { 
@@ -27,6 +26,10 @@
     }
     .tool-btn:hover {
       background: rgba(255,255,255,0.2);
+    }
+    .tool-btn.active {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid white;
     }
     /* Styling for navigation buttons */
     .nav-btn {
@@ -93,6 +96,7 @@
       <button id="add-tree" class="tool-btn">🌲 Tree</button>
       <button id="add-mountain" class="tool-btn">⛰️ Mountain</button>
       <button id="add-river" class="tool-btn">💧 River</button>
+      <button id="add-lake" class="tool-btn">🏞️ Lake</button>
       <button id="add-rock" class="tool-btn">🪨 Rock</button>
       <button id="add-grass" class="tool-btn">🌿 Grass</button>
       <button id="add-animal" class="tool-btn">🐻 Animal</button>
@@ -115,7 +119,6 @@
 
   <script type="module">
     import * as PIXI from 'https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.mjs';
-    
 
     // Initialize PIXI.js Application
     const app = new PIXI.Application({
@@ -162,6 +165,14 @@
       return app.renderer.generateTexture(graphics);  // Generate texture from graphics
     };
 
+    const createLakeTexture = () => {
+      const graphics = new PIXI.Graphics();
+      graphics.beginFill(0x2196F3); // Blue color for the lake
+      graphics.drawCircle(40, 40, 30); // Circle representing the lake
+      graphics.endFill();
+      return app.renderer.generateTexture(graphics);  // Generate texture from graphics
+    };
+
     const createGrassTexture = () => {
       const graphics = new PIXI.Graphics();
       graphics.lineStyle(2, 0x4CAF50);  // Green color for grass
@@ -174,14 +185,31 @@
       return app.renderer.generateTexture(graphics);  // Generate texture from graphics
     };
 
+    const createAnimalTexture = () => {
+      const graphics = new PIXI.Graphics();
+      graphics.beginFill(0x795548); // Brown color for animal body
+      graphics.drawCircle(40, 50, 15); // Body
+      graphics.endFill();
+      graphics.beginFill(0x5D4037); // Darker brown for head
+      graphics.drawCircle(40, 35, 10); // Head
+      graphics.endFill();
+      return app.renderer.generateTexture(graphics);  // Generate texture from graphics
+    };
+
     // Store the created textures for reuse
     const textures = {
       tree: createTreeTexture(),
       mountain: createMountainTexture(),
       rock: createRockTexture(),
       river: createRiverTexture(),
+      lake: createLakeTexture(),
       grass: createGrassTexture(),
+      animal: createAnimalTexture(),
     };
+
+    // Arrays to keep track of animals and plants
+    const animals = [];
+    const plants = [];
 
     // Tile class to represent each individual tile in the park grid
     class Tile extends PIXI.Container {
@@ -227,23 +255,67 @@
         // If the "clear" tool is selected, remove the current element from the tile
         if (window.selectedTool === 'clear') {
           if (this.currentElement) {
+            // Remove from animals array if it's an animal
+            if (this.currentElement.isAnimal) {
+              const index = animals.indexOf(this.currentElement);
+              if (index > -1) {
+                animals.splice(index, 1);
+              }
+            }
+            // Remove from plants array if it's a plant
+            if (this.currentElement.isPlant) {
+              const index = plants.indexOf(this.currentElement);
+              if (index > -1) {
+                plants.splice(index, 1);
+              }
+            }
             this.removeChild(this.currentElement);
             this.currentElement = null;
           }
         } else {
           // Otherwise, add the selected tool's element (tree, rock, etc.) to the tile
           if (this.currentElement) {
+            // Remove from animals array if it's an animal
+            if (this.currentElement.isAnimal) {
+              const index = animals.indexOf(this.currentElement);
+              if (index > -1) {
+                animals.splice(index, 1);
+              }
+            }
+            // Remove from plants array if it's a plant
+            if (this.currentElement.isPlant) {
+              const index = plants.indexOf(this.currentElement);
+              if (index > -1) {
+                plants.splice(index, 1);
+              }
+            }
             this.removeChild(this.currentElement);  // Remove any existing element first
           }
 
-          const sprite = new PIXI.Sprite(textures[window.selectedTool]);  // Create sprite using the selected tool's texture
-          sprite.width = this.size * 0.8;   // Scale the sprite
-          sprite.height = this.size * 0.8;  // Scale the sprite
-          sprite.x = this.size * 0.1;       // Position sprite inside the tile
+          const sprite = new PIXI.Sprite(textures[window.selectedTool]);
+          sprite.width = this.size * 0.8;
+          sprite.height = this.size * 0.8;
+          sprite.x = this.size * 0.1;
           sprite.y = this.size * 0.1;
 
-          this.addChild(sprite);  // Add the sprite to the tile
-          this.currentElement = sprite;  // Track the element on the tile
+          this.addChild(sprite);
+          this.currentElement = sprite;
+
+          // If the placed element is an animal, mark it and add to animals array
+          if (window.selectedTool === 'animal') {
+            sprite.isAnimal = true;
+            sprite.age = 0;
+            sprite.maturityAge = 300; // Adjust as needed
+            sprite.breedCooldown = 0;
+            animals.push(sprite);
+          }
+
+          // If the placed element is a plant, mark it and add to plants array
+          if (window.selectedTool === 'tree' || window.selectedTool === 'grass') {
+            sprite.isPlant = true;
+            sprite.growthStage = 1;
+            plants.push(sprite);
+          }
         }
       }
     }
@@ -314,13 +386,132 @@
       document.getElementById('welcome-container').style.display = 'none';  // Hide welcome screen
       document.querySelector('.toolbar').style.display = 'block';  // Show toolbar
       document.querySelector('.controls').style.display = 'block';  // Show controls
-      new NationalParkGame();  // Initialize the game (not defined in this code)
     });
 
     // Handle window resize to adjust the renderer size
     window.addEventListener('resize', () => {
       app.renderer.resize(window.innerWidth, window.innerHeight);  // Resize the PIXI canvas
     });
+
+    // Implement animal movement and behavior
+    app.ticker.add(() => {
+      // Day/night cycle
+      time += 0.01;
+      
+      // Random movement for animals
+      animals.forEach(animal => {
+        // Age the animal
+        animal.age += 1;
+
+        // Reduce breeding cooldown
+        if (animal.breedCooldown > 0) {
+          animal.breedCooldown -= 1;
+        }
+
+        // Random movement
+        const deltaX = (Math.random() - 0.5) * 1; // Move between -0.5 and 0.5
+        const deltaY = (Math.random() - 0.5) * 1;
+
+        animal.x += deltaX;
+        animal.y += deltaY;
+
+        // Ensure the animal stays within its tile
+        const parentTile = animal.parent;
+        const tileSize = parentTile.size;
+
+        if (animal.x < 0) animal.x = 0;
+        if (animal.x > tileSize - animal.width) animal.x = tileSize - animal.width;
+        if (animal.y < 0) animal.y = 0;
+        if (animal.y > tileSize - animal.height) animal.y = tileSize - animal.height;
+
+        // Breeding logic
+        if (animal.age >= animal.maturityAge && animal.breedCooldown <= 0) {
+          animals.forEach(otherAnimal => {
+            if (
+              otherAnimal !== animal &&
+              otherAnimal.age >= otherAnimal.maturityAge &&
+              otherAnimal.breedCooldown <= 0 &&
+              animal.parent === otherAnimal.parent // Ensure they are on the same tile
+            ) {
+              // Breed and create a new animal
+              const newAnimal = new PIXI.Sprite(textures['animal']);
+              newAnimal.width = animal.width;
+              newAnimal.height = animal.height;
+              newAnimal.x = animal.x;
+              newAnimal.y = animal.y;
+              newAnimal.isAnimal = true;
+              newAnimal.age = 0;
+              newAnimal.maturityAge = animal.maturityAge;
+              newAnimal.breedCooldown = 0;
+
+              animal.parent.addChild(newAnimal);
+              animals.push(newAnimal);
+
+              // Set breed cooldowns
+              animal.breedCooldown = 500;
+              otherAnimal.breedCooldown = 500;
+            }
+          });
+        }
+      });
+
+      // Plants growing over time
+      plants.forEach(plant => {
+        // Increase growth stage
+        plant.growthStage += 0.0005; // Adjust growth speed as needed
+        if (plant.growthStage > 1.5) {
+          plant.growthStage = 1.5; // Limit the growth size
+        }
+        plant.scale.set(plant.growthStage);
+      });
+
+      // Trigger natural disasters
+      triggerDisaster();
+    });
+
+    // Time variable for day/night cycle
+    let time = 0;
+
+    // Function to trigger natural disasters
+    function triggerDisaster() {
+      // Random chance to trigger a disaster
+      if (Math.random() < 0.0005) { // Adjust probability as needed
+        // Select a random tile
+        const randomIndex = Math.floor(Math.random() * mapContainer.children.length);
+        const tile = mapContainer.children[randomIndex];
+
+        // If the tile has an element, remove it
+        if (tile.currentElement) {
+          // Remove from animals array if it's an animal
+          if (tile.currentElement.isAnimal) {
+            const index = animals.indexOf(tile.currentElement);
+            if (index > -1) {
+              animals.splice(index, 1);
+            }
+          }
+          // Remove from plants array if it's a plant
+          if (tile.currentElement.isPlant) {
+            const index = plants.indexOf(tile.currentElement);
+            if (index > -1) {
+              plants.splice(index, 1);
+            }
+          }
+          tile.removeChild(tile.currentElement);
+          tile.currentElement = null;
+        }
+
+        // Visual effect (e.g., fire animation)
+        const disasterEffect = new PIXI.Graphics();
+        disasterEffect.beginFill(0xFF5722, 0.5); // Orange color for fire
+        disasterEffect.drawRect(0, 0, tile.size, tile.size);
+        disasterEffect.endFill();
+        tile.addChild(disasterEffect);
+
+        setTimeout(() => {
+          tile.removeChild(disasterEffect);
+        }, 1000); // Duration of the effect
+      }
+    }
   </script>
 </body>
 </html>
