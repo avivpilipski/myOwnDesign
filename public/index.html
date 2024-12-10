@@ -42,6 +42,31 @@
     .nav-btn:hover {
       background: rgba(255,255,255,0.2);
     }
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .hidden {
+        display: none;
+    }
+    #popupMenu button {
+        width: 100px;
+    }
   </style>
 </head>
 <body>
@@ -116,6 +141,19 @@
       <button id="view-full-map" class="nav-btn">🗺️</button>
     </div>
   </div>
+
+  <!-- Popup Menu for Animal Selection -->
+  <div id="popupMenu" class="popup hidden bg-white rounded-lg shadow-lg p-6 space-y-4">
+    <h2 class="text-2xl font-semibold text-center text-gray-800">Select an Animal</h2>
+    <div class="grid grid-cols-2 gap-4">
+      <button class="animalOption px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200" data-animal="Grizzly Bear">Grizzly Bear</button>
+      <button class="animalOption px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-200" data-animal="Elk">Elk</button>
+      <button class="animalOption px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition duration-200" data-animal="Bison">Bison</button>      
+    </div>
+    <div class="flex justify-center">
+        <button id="closeButton" class="mt-4 px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-200">Close</button>
+    </div>
+</div>
 
   <script type="module">
     import * as PIXI from 'https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.mjs';
@@ -310,6 +348,15 @@
             animals.push(sprite);
           }
 
+          // If the placed element is an animal, mark it and add to animals array
+          if (window.selectedTool === 'popupMenu') {
+            sprite.isAnimal = true;
+            sprite.age = 0;
+            sprite.maturityAge = 300; // Adjust as needed
+            sprite.breedCooldown = 0;
+            animals.push(sprite);
+          }
+
           // If the placed element is a plant, mark it and add to plants array
           if (window.selectedTool === 'tree' || window.selectedTool === 'grass') {
             sprite.isPlant = true;
@@ -391,6 +438,25 @@
     // Handle window resize to adjust the renderer size
     window.addEventListener('resize', () => {
       app.renderer.resize(window.innerWidth, window.innerHeight);  // Resize the PIXI canvas
+    });
+
+    // When the "Animal" button is clicked, show the animal selection popup
+    document.getElementById('add-animal').addEventListener('click', () => {
+        document.getElementById('popupMenu').classList.remove('hidden');
+    });
+
+    // Close the popup when the "Close" button is clicked
+    document.getElementById('closeButton').addEventListener('click', () => {
+        document.getElementById('popupMenu').classList.add('hidden');
+    });
+
+    // When an animal option is clicked, set the selected animal tool
+    document.querySelectorAll('.animalOption').forEach(button => {
+        button.addEventListener('click', event => {
+            const selectedAnimal = event.target.dataset.animal.toLowerCase();
+            window.selectedTool = selectedAnimal; // Update the tool to the selected animal type
+            document.getElementById('popupMenu').classList.add('hidden'); // Hide the popup
+        });
     });
 
     // Implement animal movement and behavior
@@ -512,6 +578,7 @@
         }, 1000); // Duration of the effect
       }
     }
+
   </script>
 </body>
 </html>
